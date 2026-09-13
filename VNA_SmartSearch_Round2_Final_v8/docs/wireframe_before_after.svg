@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="940" viewBox="0 0 1600 940">
+  <defs><style>
+    .title{font:700 36px Arial,sans-serif;fill:#083f46}.label{font:700 25px Arial,sans-serif;fill:#083f46}
+    .h{font:700 20px Arial,sans-serif;fill:#173f45}.t{font:16px Arial,sans-serif;fill:#53686d}.tiny{font:13px Arial,sans-serif;fill:#6d7e82}
+    .page{fill:#fff;stroke:#bdc9c9;stroke-width:3;rx:20}.nav{fill:#075b66}.field{fill:#fff;stroke:#aebbbc;stroke-width:2;rx:8}
+    .panel{fill:#eef8f7;stroke:#0d6770;stroke-width:2;rx:12}.gold{fill:#d6ad3b}.card{fill:#fff;stroke:#cdd7d7;stroke-width:2;rx:10}
+    .button{fill:#086875;rx:8}.bt{font:700 15px Arial,sans-serif;fill:#fff}
+  </style></defs>
+  <rect width="1600" height="940" fill="#f7f5ef"/>
+  <text x="70" y="62" class="title">Vietnam Airlines Australia Search — Before vs SmartSearch</text>
+
+  <text x="70" y="112" class="label">BEFORE · static search</text>
+  <rect x="70" y="135" width="690" height="735" class="page"/>
+  <rect x="70" y="135" width="690" height="72" class="nav" rx="20"/><rect x="70" y="185" width="690" height="22" class="nav"/>
+  <text x="105" y="180" class="bt">VIETNAM AIRLINES</text><text x="610" y="180" class="bt">Book · Manage · Login</text>
+  <text x="115" y="270" class="h">Book a flight</text>
+  <rect x="110" y="305" width="275" height="58" class="field"/><text x="130" y="340" class="t">From</text>
+  <rect x="410" y="305" width="275" height="58" class="field"/><text x="430" y="340" class="t">To</text>
+  <rect x="110" y="385" width="275" height="58" class="field"/><text x="130" y="420" class="t">Departure date</text>
+  <rect x="410" y="385" width="275" height="58" class="field"/><text x="430" y="420" class="t">Return date</text>
+  <rect x="110" y="465" width="275" height="58" class="field"/><text x="130" y="500" class="t">Passengers</text>
+  <rect x="410" y="465" width="275" height="58" class="field"/><text x="430" y="500" class="t">Cabin</text>
+  <rect x="505" y="555" width="180" height="54" class="button"/><text x="558" y="588" class="bt">SEARCH</text>
+  <text x="115" y="675" class="h">Limitations</text>
+  <text x="115" y="715" class="t">• User must already know route and dates</text>
+  <text x="115" y="750" class="t">• Budget and family constraints entered separately</text>
+  <text x="115" y="785" class="t">• No explanation of why an option fits</text>
+
+  <text x="840" y="112" class="label">AFTER · SmartSearch assistance</text>
+  <rect x="840" y="135" width="690" height="735" class="page"/>
+  <rect x="840" y="135" width="690" height="72" class="nav" rx="20"/><rect x="840" y="185" width="690" height="22" class="nav"/>
+  <text x="875" y="180" class="bt">VNA SMARTSEARCH</text><text x="1340" y="180" class="bt">EN / VI</text>
+  <text x="885" y="260" class="h">Tell us the trip you need</text>
+  <rect x="880" y="285" width="610" height="92" class="panel"/>
+  <text x="905" y="325" class="t">“2 people from Sydney and 2 from Melbourne to Hanoi</text>
+  <text x="905" y="352" class="t">for Tết 2027, shared budget A$4,000.”</text>
+  <rect x="1295" y="395" width="195" height="50" class="button"/><text x="1344" y="426" class="bt">SMART SEARCH</text>
+
+  <rect x="880" y="480" width="610" height="126" class="card"/>
+  <rect x="880" y="480" width="8" height="126" class="gold"/>
+  <text x="910" y="515" class="h">Sydney → Hanoi · 2 travellers</text>
+  <text x="910" y="548" class="t">Direct option · within preferred date window</text>
+  <text x="910" y="578" class="tiny">Why recommended: fewer stops + fits group plan</text>
+  <text x="1360" y="545" class="h">A$—</text>
+
+  <rect x="880" y="625" width="610" height="126" class="card"/>
+  <rect x="880" y="625" width="8" height="126" class="gold"/>
+  <text x="910" y="660" class="h">Melbourne → Hanoi · 2 travellers</text>
+  <text x="910" y="693" class="t">Coordinated arrival · shared budget checked</text>
+  <text x="910" y="723" class="tiny">Price and availability confirmed by the selected data source</text>
+  <text x="1360" y="690" class="h">A$—</text>
+
+  <rect x="880" y="780" width="610" height="60" class="panel"/>
+  <text x="905" y="817" class="h">Continue on Vietnam Airlines →</text>
+  <text x="70" y="915" class="tiny">Wireframe only. Payment, reservation creation and ticket issuance remain on Vietnam Airlines’ official flow.</text>
+</svg>

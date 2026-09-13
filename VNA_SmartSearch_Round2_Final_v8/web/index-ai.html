@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VNA Agentic Gateway — Live AI Demo</title>
+<style>
+  :root{
+    --ink:#10262b; --teal:#0d5c5c; --teal-deep:#093f3f;
+    --gold:#c9a24b; --gold-soft:#e7d6a8; --paper:#f6f2e9; --card:#ffffff;
+    --line:#e2dccb; --muted:#5f716e; --good:#1c7a5d; --tool:#8a6d1f; --code-bg:#0e2b2b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:940px;margin:0 auto;padding:0 18px 70px;}
+
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;
+    border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:5;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .mark{width:40px;height:40px;border-radius:50%;background:var(--teal-deep);color:var(--gold);
+    display:grid;place-items:center;font-size:20px;}
+  .brand h1{font-size:17px;margin:0;color:var(--teal-deep);letter-spacing:.2px;}
+  .brand p{font-size:12px;margin:1px 0 0;color:var(--muted);}
+  .top-tag{font-size:12px;color:var(--muted);font-style:italic;text-align:right;}
+
+  .hero{text-align:center;padding:32px 10px 6px;}
+  .hero h2{font-size:29px;line-height:1.13;margin:0 0 10px;color:var(--teal-deep);}
+  .hero p{font-size:15px;line-height:1.55;color:var(--muted);max-width:610px;margin:0 auto;}
+  .hero .pill{display:inline-block;margin-top:13px;font-size:12.5px;color:var(--teal);
+    background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 14px;}
+
+  .examples{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px auto 6px;max-width:800px;}
+  .examples button{font-size:12.5px;color:var(--teal);background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:8px 14px;cursor:pointer;font-family:inherit;line-height:1.2;transition:.15s;}
+  .examples button:hover{border-color:var(--teal);background:#fbf9f4;}
+
+  .console{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;box-shadow:0 4px 22px rgba(9,63,63,.07);}
+  .console.maximized{position:fixed;inset:12px;z-index:100;margin:0;display:flex;flex-direction:column;border-radius:16px;box-shadow:0 20px 70px rgba(9,35,35,.28);}
+  body.chat-maximized{overflow:hidden;}.console.maximized .stream{flex:1;min-height:0;max-height:none}.console.maximized .console-head,.console.maximized .composer{flex:none}
+  .console-head{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--teal-deep);color:#fff;font-size:13px;}
+  .window-controls{display:flex;align-items:center;gap:7px;margin-right:3px}.window-btn{width:22px;height:22px;border:0;border-radius:50%;display:grid;place-items:center;padding:0;font:700 13px/1 Arial,sans-serif;color:#fff;background:#718180;opacity:.68;cursor:default;transition:.18s}.window-btn:not(:disabled){cursor:pointer;opacity:1}.window-btn.maximize:not(:disabled){background:#d9534f}.window-btn.restore:not(:disabled){background:#e0ae32;color:#4b3907}.window-btn:not(:disabled):hover{transform:scale(1.08)}
+  .console-head .live{margin-left:auto;font-size:11.5px;color:var(--gold-soft);display:flex;align-items:center;gap:6px;}
+  .live .beat{width:7px;height:7px;border-radius:50%;background:#59d38f;animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  .stream{padding:16px;min-height:240px;max-height:62vh;overflow-y:auto;}
+  .msg{margin-bottom:14px;animation:rise .3s ease both;}
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .msg .who{font-size:11.5px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px;color:var(--muted);}
+  .bubble{border-radius:12px;padding:12px 14px;font-size:14.5px;line-height:1.55;}
+  .user .bubble{background:#eef4f1;border:1px solid #dce8e2;}
+  .agent .who{color:var(--teal);font-weight:700;}
+  .agent .bubble{background:#f3f8f6;border:1px solid #d9e9e2;}
+  .bubble p{margin:0 0 8px;} .bubble p:last-child{margin:0;}
+  .bubble strong{color:var(--teal-deep);}
+
+  .toolcall{margin:10px 0;border:1px solid #e6dcbf;border-radius:11px;overflow:hidden;background:#fdfaf1;animation:rise .3s ease both;}
+  .tc-head{display:flex;align-items:center;gap:9px;padding:9px 13px;background:#f6edd6;cursor:pointer;}
+  .tc-icon{width:20px;height:20px;border-radius:5px;background:var(--tool);color:#fff;display:grid;place-items:center;font-size:12px;flex:none;}
+  .tc-title{font-size:13px;color:#6f5813;font-weight:700;}
+  .tc-route{font-size:11.5px;color:#9a854a;}
+  .tc-arrow{margin-left:auto;font-size:12px;color:#9a854a;}
+  .tc-body{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;padding:0 13px;}
+  .tc-body.open{max-height:560px;padding:11px 13px;overflow-y:auto;}
+  .codeblock{background:var(--code-bg);border-radius:8px;padding:10px 12px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;font-size:12px;line-height:1.5;
+    white-space:pre-wrap;word-break:break-word;color:#cfeee2;}
+  .codeblock .k{color:#8fd6b6;} .codeblock .s{color:#e7c98a;} .codeblock .n{color:#f0a37e;}
+  .tc-label{font-size:11px;color:#9a854a;margin:8px 0 4px;letter-spacing:.3px;text-transform:uppercase;}
+  .tc-status{font-size:11px;color:var(--good);margin-left:6px;}
+
+  .flights{display:flex;flex-direction:column;gap:9px;margin-top:10px;}
+  .fcard{border:1px solid var(--line);border-radius:11px;padding:12px 14px;display:flex;justify-content:space-between;gap:14px;background:#fff;}
+  .fcard.best{border:1.5px solid var(--gold);box-shadow:0 3px 14px rgba(201,162,75,.14);position:relative;}
+  .best-badge{position:absolute;top:-9px;left:14px;background:var(--gold);color:#3a2c05;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:12px;}
+  .froute{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:var(--teal-deep);}
+  .fmeta{font-size:12px;color:var(--muted);margin-top:3px;}
+  .fwhy{font-size:12.5px;color:var(--teal-deep);background:#f0f6f2;border:1px solid #dcebe3;border-radius:7px;padding:5px 9px;margin-top:8px;display:inline-block;}
+  .fright{text-align:right;flex:none;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;}
+  .fprice{font-size:22px;font-weight:700;color:var(--teal-deep);}
+  .fprice .old{font-size:13px;color:#a89b7a;text-decoration:line-through;margin-right:6px;font-weight:400;}
+  .fsub{font-size:11px;color:var(--muted);}
+  .farebox{margin-top:8px;border:1px solid var(--line);border-radius:10px;background:#fcfaf5;overflow:hidden;}
+  .farebox summary{cursor:pointer;padding:9px 13px;font-size:12.5px;font-weight:700;color:var(--teal-deep);list-style:none;}
+  .fare-list{padding:2px 11px 11px;display:flex;flex-direction:column;gap:7px;}
+  .fareitem{border:1px solid #ece5d4;border-radius:8px;padding:8px 11px;background:#fff;}
+  .fare-top{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;color:var(--teal-deep);}
+  .fare-conds{font-size:11px;color:var(--muted);margin-top:5px;}
+
+  .booking{margin-top:11px;border:1.5px solid var(--good);border-radius:12px;padding:14px 16px;background:#f1f9f4;}
+  .booking h4{margin:0 0 8px;font-size:15px;color:var(--good);}
+  .booking .row{display:flex;justify-content:space-between;font-size:13.5px;padding:3px 0;}
+  .booking .row b{color:var(--teal-deep);}
+  .handoff{margin-top:11px;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #cfe6d8;border-radius:9px;padding:10px 12px;font-size:13px;color:var(--teal-deep);}
+  .no-ota{margin-top:9px;font-size:12.5px;color:var(--good);font-style:italic;}
+
+  .composer{display:flex;gap:10px;padding:13px 16px;border-top:1px solid var(--line);background:#fbfaf6;}
+  .composer input{flex:1;border:1.5px solid var(--line);border-radius:11px;padding:12px 14px;font-size:14.5px;font-family:inherit;background:#fff;}
+  .composer input:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .composer button{background:var(--teal);color:#fff;border:none;border-radius:11px;padding:0 20px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .composer button:disabled{background:var(--muted);cursor:default;}
+
+  .thinking{display:inline-flex;gap:4px;align-items:center;}
+  .thinking span{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:blink 1.1s infinite;}
+  .thinking span:nth-child(2){animation-delay:.2s;}
+  .thinking span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,100%{opacity:.25;}50%{opacity:1;}}
+
+  .arch{margin-top:24px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;}
+  .arch h3{margin:0 0 6px;font-size:15px;color:var(--teal-deep);}
+  .arch p{margin:0 0 12px;font-size:13px;color:var(--muted);line-height:1.55;}
+  .flow{display:flex;align-items:stretch;flex-wrap:wrap;}
+  .node{flex:1;min-width:150px;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fbfaf6;}
+  .node .nt{font-size:12.5px;font-weight:700;color:var(--teal-deep);margin-bottom:3px;}
+  .node .nd{font-size:11.5px;color:var(--muted);line-height:1.4;}
+  .arrow{display:grid;place-items:center;padding:0 8px;color:var(--gold);font-size:18px;flex:none;}
+  @media(max-width:700px){.arrow{transform:rotate(90deg);padding:6px 0;}.flow{flex-direction:column;}}
+
+  .err{background:#fff2f0;border:1px solid #f0c9c2;color:#a03a2a;border-radius:10px;padding:11px 13px;font-size:13.5px;}
+  footer.foot{text-align:center;font-size:12px;color:var(--muted);padding:22px 10px 0;}
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="mark">✦</div>
+      <div><h1>Vietnam Airlines · SmartSearch AI Lab</h1>
+        <p>Optional technical experiment · customer demo is index.html</p></div>
+    </div>
+    <div class="top-tag">Optional API-dependent mode<br/>prototype tools and fixtures</div>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <h2>Explore SmartSearch with optional AI interpretation</h2>
+      <p>The agent reads your request, chooses prototype tools and explains illustrative
+         options. Live VNA data and booking handoff require authorised integration.</p>
+      <div class="pill">Optional Claude interpretation · 10 prototype MCP tools</div>
+    </section>
+
+    <div class="examples" id="examples"></div>
+
+    <section class="console" id="chatConsole">
+      <div class="console-head">
+        <div class="window-controls" aria-label="Chat window controls">
+          <button class="window-btn restore" id="restoreChat" type="button" disabled aria-disabled="true" aria-label="Restore chat size" title="Restore chat size">−</button>
+          <button class="window-btn maximize" id="maximizeChat" type="button" aria-disabled="false" aria-label="Maximise chat" title="Maximise chat">↗</button>
+        </div>
+        <span>claude agent ⇄ vna-agentic-gateway</span>
+        <span class="live"><span class="beat"></span>experimental</span>
+      </div>
+      <div class="stream" id="stream">
+        <div class="msg agent"><div class="who">Travel Agent</div>
+          <div class="bubble">Tell me about your trip. I can interpret the request and demonstrate how SmartSearch would compare options before a VNA handoff.</div>
+        </div>
+      </div>
+      <div class="composer">
+        <input id="input" type="text" placeholder="Ask anything — e.g. get my family of 4 to Hanoi for Tết under $550pp, I'm Gold" />
+        <button id="send">Send</button>
+      </div>
+    </section>
+
+    <section class="arch">
+      <h3>What's happening under the hood</h3>
+      <p>Claude reads the message and chooses which prototype Model Context Protocol tools
+         to call. The fixture provider is isolated so it can later be replaced by a
+         VNA-authorised data service without touching payment or ticketing systems.</p>
+      <div class="flow">
+        <div class="node"><div class="nt">You / any AI agent</div><div class="nd">Free-form request in natural language</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="nt">Claude agent</div><div class="nd">Decides which VNA tools to call, and in what order</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="nt">VNA MCP Gateway</div><div class="nd">search · Lotusmiles · flexible dates · booking intent</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="nt">Vietnam Airlines</div><div class="nd">Future authorised data and official booking handoff</div></div>
+      </div>
+    </section>
+
+    <footer class="foot">Illustrative prototype fixtures · live fare and availability must be validated by Vietnam Airlines</footer>
+  </div>
+
+<script>
+// ===========================================================================
+//  FIXTURE DATA
+// ===========================================================================
+const FLIGHTS = [
+  {id:"VN782",origin:"SYD",destination:"SGN",oc:"Sydney",dc:"Ho Chi Minh City",date:"2026-02-10",depart:"11:20",dur:"9h 45m",stops:0,price:505,ac:"A350"},
+  {id:"VN772",origin:"SYD",destination:"SGN",oc:"Sydney",dc:"Ho Chi Minh City",date:"2026-02-12",depart:"21:35",dur:"9h 45m",stops:0,price:468,ac:"A350"},
+  {id:"VN770",origin:"SYD",destination:"HAN",oc:"Sydney",dc:"Hanoi",date:"2026-02-11",depart:"10:05",dur:"10h 35m",stops:0,price:540,ac:"B787"},
+  {id:"VN774",origin:"SYD",destination:"HAN",oc:"Sydney",dc:"Hanoi",date:"2026-02-14",depart:"22:10",dur:"10h 35m",stops:0,price:512,ac:"B787"},
+  {id:"VN720",origin:"MEL",destination:"SGN",oc:"Melbourne",dc:"Ho Chi Minh City",date:"2026-02-10",depart:"12:15",dur:"10h 15m",stops:0,price:530,ac:"A350"},
+  {id:"VN722",origin:"MEL",destination:"SGN",oc:"Melbourne",dc:"Ho Chi Minh City",date:"2026-02-13",depart:"23:45",dur:"10h 15m",stops:0,price:489,ac:"A350"},
+  {id:"VN760",origin:"MEL",destination:"HAN",oc:"Melbourne",dc:"Hanoi",date:"2026-02-12",depart:"11:00",dur:"11h 05m",stops:0,price:565,ac:"B787"},
+  {id:"VN311",origin:"SYD",destination:"DAD",oc:"Sydney",dc:"Da Nang",date:"2026-02-11",depart:"09:30",dur:"11h 25m",stops:1,price:598,ac:"A321"},
+  {id:"VN788",origin:"SYD",destination:"SGN",oc:"Sydney",dc:"Ho Chi Minh City",date:"2026-02-16",depart:"11:20",dur:"9h 45m",stops:0,price:445,ac:"A350"},
+  {id:"VN724",origin:"MEL",destination:"SGN",oc:"Melbourne",dc:"Ho Chi Minh City",date:"2026-02-17",depart:"12:15",dur:"10h 15m",stops:0,price:430,ac:"A350"},
+  {id:"VN776",origin:"SYD",destination:"HAN",oc:"Sydney",dc:"Hanoi",date:"2026-02-18",depart:"10:05",dur:"10h 35m",stops:0,price:498,ac:"B787"},
+  {id:"VN726",origin:"BNE",destination:"SGN",oc:"Brisbane",dc:"Ho Chi Minh City",date:"2026-02-13",depart:"13:40",dur:"10h 30m",stops:0,price:552,ac:"A350"},
+];
+const LOTUS={none:0,silver:.05,titanium:.08,gold:.10,platinum:.12};
+const BAGGAGE=[{code:"EXTRA20",label:"+20kg checked",price:60},{code:"EXTRA30",label:"+30kg checked",price:85},{code:"EXTRA40",label:"+40kg checked (family)",price:110}];
+const ROUTES={"SYD-SGN":{weekly:14,ac:"A350","time":"9h 45m"},"SYD-HAN":{weekly:7,ac:"B787","time":"10h 35m"},"MEL-SGN":{weekly:10,ac:"A350","time":"10h 15m"},"MEL-HAN":{weekly:5,ac:"B787","time":"11h 05m"},"BNE-SGN":{weekly:5,ac:"A350","time":"10h 30m"},"SYD-DAD":{weekly:3,ac:"A321","time":"11h 25m (1 stop)"},"PER-SGN":{weekly:5,ac:"A321neo","time":"7h 05m"},"PER-HAN":{weekly:3,ac:"A350","time":"8h 10m"},"PER-DAD":{weekly:3,ac:"A321neo","time":"7h 40m"}};
+const CITY={SYD:"Sydney",MEL:"Melbourne",BNE:"Brisbane",PER:"Perth",SGN:"Ho Chi Minh City",HAN:"Hanoi",DAD:"Da Nang"};
+const AUD=n=>"A$"+Number(n).toLocaleString("en-AU");
+
+// Full-date demo generator shared conceptually with the stable page. This
+// keeps 2027 searches functional until an authorised VNA feed replaces it.
+const ROUTE_SPEC={
+  "SYD-SGN":{oc:"Sydney",dc:"Ho Chi Minh City",dur:"8h 50m",base:510,ac:"A350",times:[["07:20","VN781"],["11:20","VN782"],["21:35","VN772"]]},
+  "SYD-HAN":{oc:"Sydney",dc:"Hanoi",dur:"9h 55m",base:545,ac:"B787",times:[["10:05","VN770"],["22:10","VN774"]]},
+  "SYD-DAD":{oc:"Sydney",dc:"Da Nang",dur:"9h 20m",base:565,ac:"A321neo",times:[["09:30","VN311"]]},
+  "MEL-SGN":{oc:"Melbourne",dc:"Ho Chi Minh City",dur:"8h 25m",base:500,ac:"A350",times:[["12:15","VN720"],["23:45","VN722"]]},
+  "MEL-HAN":{oc:"Melbourne",dc:"Hanoi",dur:"9h 15m",base:540,ac:"B787",times:[["11:00","VN760"],["23:20","VN766"]]},
+  "PER-SGN":{oc:"Perth",dc:"Ho Chi Minh City",dur:"7h 05m",base:470,ac:"A321neo",times:[["01:15","VN68"],["14:30","VN66"]]},
+  "PER-HAN":{oc:"Perth",dc:"Hanoi",dur:"8h 10m",base:510,ac:"A350",times:[["23:55","VN72"]]},
+  "PER-DAD":{oc:"Perth",dc:"Da Nang",dur:"7h 40m",base:520,ac:"A321neo",times:[["02:20","VN76"]]},
+  "BNE-SGN":{oc:"Brisbane",dc:"Ho Chi Minh City",dur:"9h 30m",base:540,ac:"A350",times:[["13:40","VN726"]],stops:1},
+};
+const FARE_CLASSES=[
+  {name:"Economy Super Lite",mult:1.00,change:"Not changeable",refund:"Non-refundable"},
+  {name:"Economy Lite",mult:1.08,change:"Change fee applies",refund:"Refund fee applies"},
+  {name:"Economy Classic",mult:1.18,change:"Change permitted",refund:"Refund permitted with conditions"},
+  {name:"Economy Flex",mult:1.35,change:"Most flexible",refund:"Refund permitted with conditions"},
+];
+function fareLadder(price){return FARE_CLASSES.map(f=>({...f,price_aud:Math.round(price*f.mult/5)*5,baggage:"Baggage subject to fare conditions"}));}
+function seasonFactor(dateStr){
+  const d=new Date(dateStr),m=d.getMonth()+1,day=d.getDate();
+  if(m===2&&day>=1&&day<=12)return 1.75;
+  if((m===12&&day>=18)||(m===1&&day<=5))return 1.55;
+  if(m===12||m===1)return 1.35;
+  if(m===2)return 1.4;
+  if(m>=6&&m<=8)return 1.3;
+  if(m===3||m===9||m===10)return .9;
+  return 1;
+}
+function seededVar(seed){let x=0;for(let i=0;i<seed.length;i++)x=(x*31+seed.charCodeAt(i))%997;return x/997;}
+const GENERATED=[];
+function generateFlights(routeKey,dateStr){
+  const spec=ROUTE_SPEC[routeKey];if(!spec)return[];
+  const [origin,destination]=routeKey.split("-");
+  return spec.times.map(([depart,code])=>{
+    const price=Math.round((spec.base*seasonFactor(dateStr)+seededVar(code+dateStr)*90-30)/5)*5;
+    return{id:`${code}-${dateStr}`,flight_number:code,origin,destination,oc:spec.oc,dc:spec.dc,date:dateStr,depart,dur:spec.dur,stops:spec.stops||0,price,ac:spec.ac,fares:fareLadder(price),_generated:true};
+  });
+}
+function fmtISO(d){return d.toISOString().slice(0,10);}
+function flightsForRoute(origin,destination,dateFrom,dateTo){
+  const key=origin+"-"+destination;if(!ROUTE_SPEC[key])return[];
+  const start=new Date(dateFrom||"2027-02-01");
+  const end=new Date(dateTo||new Date(start.getTime()+6*864e5));
+  const days=Math.min(14,Math.max(1,Math.round((end-start)/864e5)+1));
+  const out=[];
+  for(let i=0;i<days;i++)out.push(...generateFlights(key,fmtISO(new Date(start.getTime()+i*864e5))));
+  GENERATED.splice(0,GENERATED.length,...out);
+  return out;
+}
+function findFlight(id){return GENERATED.find(x=>x.id===id)||FLIGHTS.find(x=>x.id===id);}
+
+// ===========================================================================
+//  TOOL IMPLEMENTATIONS (the "MCP gateway" executing against VNA data)
+// ===========================================================================
+const TOOLS = {
+  search_flights(a){
+    let pool=(a.origin&&a.destination&&ROUTE_SPEC[a.origin+"-"+a.destination])
+      ? flightsForRoute(a.origin,a.destination,a.date_from,a.date_to)
+      : FLIGHTS.filter(f=>(!a.origin||f.origin===a.origin)&&(!a.destination||f.destination===a.destination));
+    if(a.direct_only) pool=pool.filter(f=>f.stops===0);
+    if(a.date_from) pool=pool.filter(f=>f.date>=a.date_from);
+    if(a.date_to) pool=pool.filter(f=>f.date<=a.date_to);
+    const pax=a.passengers||1;
+    const scored=pool.map(f=>{let s=100,r=[];
+      if(f.stops===0)r.push("direct");
+      if(a.max_price_aud){if(f.price<=a.max_price_aud){s+=20;const u=a.max_price_aud-f.price;r.push(u>=20?AUD(u)+" under budget":"within budget");}else s-=(f.price-a.max_price_aud)/10;}
+      if(f.stops===0)s+=10;
+      if(a.prefers_night){const h=+f.depart.split(":")[0];if(h>=20||h<=4){s+=12;r.push("overnight flight");}}
+      s+=(600-f.price)/20;
+      return {id:f.id,origin:f.origin,destination:f.destination,oc:f.oc,dc:f.dc,date:f.date,depart:f.depart,dur:f.dur,stops:f.stops,price_aud:f.price,ac:f.ac,fares:f.fares||fareLadder(f.price),reasons:r,total_for_party_aud:f.price*pax,_s:s};});
+    scored.sort((x,y)=>y._s-x._s);
+    return {count:scored.length,results:scored.slice(0,5).map(({_s,...x})=>x)};
+  },
+  get_fare_details(a){const f=findFlight(a.flight_id);return f?{flight:f,base_fare_aud:f.price,included_baggage_kg:23}:{error:"flight not found"};},
+  get_lotusmiles_price(a){const f=findFlight(a.flight_id);if(!f)return{error:"not found"};const r=LOTUS[a.tier]??0;const m=Math.round(f.price*(1-r));return{flight_id:a.flight_id,standard_price_aud:f.price,tier:a.tier,member_price_aud:m,you_save_aud:f.price-m,note:"Illustrative personalised-offer scenario; not an official tier entitlement"};},
+  suggest_flexible_dates(a){const t=new Date(a.around_date),w=a.window_days||4;const start=fmtISO(new Date(t.getTime()-w*864e5)),end=fmtISO(new Date(t.getTime()+w*864e5));const o=flightsForRoute(a.origin,a.destination,start,end).map(f=>({date:f.date,flight_id:f.id,price_aud:f.price,days_off:Math.round(Math.abs(new Date(f.date)-t)/864e5)})).sort((x,y)=>x.price_aud-y.price_aud);return o.length?{cheapest:o[0],all_options:o}:{message:"no options in window"};},
+  check_availability(a){const f=findFlight(a.flight_id);if(!f)return{error:"not found"};const s=f.price>520?40:(f.price>470?12:6);return{flight_id:a.flight_id,seats_left:s,can_seat_party:s>=(a.passengers||1)};},
+  get_baggage_options(a){const f=findFlight(a.flight_id);if(!f)return{error:"not found"};return{flight_id:a.flight_id,included_baggage_kg:23,add_ons:BAGGAGE};},
+  compare_family_bundle(a){const f=findFlight(a.flight_id);if(!f)return{error:"not found"};const pax=a.passengers||4;const r=LOTUS[a.tier]??0;const pp=Math.round(f.price*(1-r));const bag=BAGGAGE[2];return{flight_id:a.flight_id,passengers:pax,fare_per_person_aud:pp,fares_total_aud:pp*pax,suggested_group_baggage:bag,bundle_total_aud:pp*pax+bag.price,adjacent_seating:"group seat-together supported at handoff"};},
+  get_route_info(a){const k=a.origin+"-"+a.destination;const i=ROUTES[k];return i?{route:k,from_city:CITY[a.origin],to_city:CITY[a.destination],weekly_frequency:i.weekly,aircraft:i.ac,flight_time:i.time}:{error:"route not in network",available:Object.keys(ROUTES)};},
+  create_booking_intent(a){const f=findFlight(a.flight_id);if(!f)return{error:"not found"};const pax=a.passengers||1;const r=LOTUS[a.tier]??0;const pp=Math.round(f.price*(1-r));const ref=`DEMO-${a.flight_id}-${pax}P`;return{selection_ref:ref,handoff_status:"prototype_only",flight_id:f.id,route:`${f.origin}→${f.destination}`,date:f.date,passengers:pax,price_per_person_aud:pp,total_aud:pp*pax,tier:a.tier||"none",handoff_url:"https://www.vietnamairlines.com/au/en/home",note:"Safe prototype link only. Production needs a VNA-issued offer/session token; no booking is created here."};},
+  plan_multi_origin_trip(a){
+    const tier=a.tier||"none",rate=LOTUS[tier]??0;
+    const totals={},order=[];
+    for(const g of a.groups||[]){
+      if(!g.origin||!Number.isFinite(+g.passengers)||+g.passengers<1)return{error:"invalid_group",message:"Each group needs an origin and at least one passenger."};
+      if(totals[g.origin]===undefined){totals[g.origin]=0;order.push(g.origin);}
+      totals[g.origin]+=+g.passengers;
+    }
+    const normalised_groups=order.map(origin=>({origin,passengers:totals[origin]}));
+    const legs=normalised_groups.map(g=>{
+      const result=TOOLS.search_flights({origin:g.origin,destination:a.destination,date_from:a.date_from,date_to:a.date_to,passengers:g.passengers});
+      const best=result.results[0],pp=best?Math.round(best.price_aud*(1-rate)):null;
+      return{origin:g.origin,passengers:g.passengers,flight_id:best?.id||null,date:best?.date||null,price_per_person_aud:pp,subtotal_aud:pp?pp*g.passengers:null};
+    });
+    const unavailable_routes=legs.filter(leg=>!leg.flight_id).map(leg=>({origin:leg.origin,destination:a.destination,passengers:leg.passengers}));
+    if(unavailable_routes.length)return{error:"route_unavailable",message:"At least one requested route is unavailable in the prototype data; no total or budget result was calculated.",unavailable_routes,normalised_groups,grand_total_aud:null,within_budget:null,budget_headroom_aud:null};
+    const total=legs.reduce((sum,leg)=>sum+leg.subtotal_aud,0);
+    return{destination:a.destination,legs,normalised_groups,total_passengers:normalised_groups.reduce((s,g)=>s+g.passengers,0),grand_total_aud:total,shared_budget_aud:a.total_budget||null,within_budget:a.total_budget?total<=a.total_budget:null,budget_headroom_aud:a.total_budget?a.total_budget-total:null};
+  },
+};
+
+// ===========================================================================
+//  TOOL SCHEMAS for Claude (Anthropic tool-use format)
+// ===========================================================================
+const TODAY_CONTEXT = "Today is 13 September 2026. This challenge focuses on travel for Tết 2027; use 1–10 February 2027 as the demo search window unless the traveller gives exact dates.";
+const TOOL_SCHEMAS = [
+  {name:"search_flights",description:"Search demo Vietnam Airlines flight content from Australia (SYD/MEL/BNE/PER) to Vietnam. Returns ranked options with reasons.",
+   input_schema:{type:"object",properties:{origin:{type:"string",enum:["SYD","MEL","BNE","PER"]},destination:{type:"string",enum:["SGN","HAN","DAD"]},date_from:{type:"string",description:"YYYY-MM-DD"},date_to:{type:"string",description:"YYYY-MM-DD"},passengers:{type:"integer"},max_price_aud:{type:"number"},direct_only:{type:"boolean"},prefers_night:{type:"boolean"}},required:["origin","destination"]}},
+  {name:"get_lotusmiles_price",description:"Calculate an illustrative personalised-offer scenario for a Lotusmiles tier. Rates are not official tier entitlements.",
+   input_schema:{type:"object",properties:{flight_id:{type:"string"},tier:{type:"string",enum:["silver","titanium","gold","platinum"]}},required:["flight_id","tier"]}},
+  {name:"suggest_flexible_dates",description:"For flexible travellers, find the cheapest nearby dates around a target date on a route.",
+   input_schema:{type:"object",properties:{origin:{type:"string"},destination:{type:"string"},around_date:{type:"string",description:"YYYY-MM-DD"},window_days:{type:"integer"}},required:["origin","destination","around_date"]}},
+  {name:"get_fare_details",description:"Full fare detail for one flight id (e.g. VN782).",
+   input_schema:{type:"object",properties:{flight_id:{type:"string"}},required:["flight_id"]}},
+  {name:"check_availability",description:"Check seats left for a flight and party size.",
+   input_schema:{type:"object",properties:{flight_id:{type:"string"},passengers:{type:"integer"}},required:["flight_id"]}},
+  {name:"get_baggage_options",description:"List extra baggage add-ons for a flight (useful for VFR travellers carrying gifts home).",
+   input_schema:{type:"object",properties:{flight_id:{type:"string"}},required:["flight_id"]}},
+  {name:"compare_family_bundle",description:"Build a family group bundle: total fare, group baggage, adjacent seating. For multi-passenger trips.",
+   input_schema:{type:"object",properties:{flight_id:{type:"string"},passengers:{type:"integer"},tier:{type:"string"}},required:["flight_id"]}},
+  {name:"get_route_info",description:"Network info for a route: weekly frequency, aircraft, flight time.",
+   input_schema:{type:"object",properties:{origin:{type:"string"},destination:{type:"string"}},required:["origin","destination"]}},
+  {name:"plan_multi_origin_trip",description:"Plan multiple origin groups meeting at one Vietnam destination and check a shared budget.",
+   input_schema:{type:"object",properties:{groups:{type:"array",items:{type:"object",properties:{origin:{type:"string"},passengers:{type:"integer"}},required:["origin","passengers"]}},destination:{type:"string"},date_from:{type:"string"},date_to:{type:"string"},total_budget:{type:"number"},tier:{type:"string"}},required:["groups","destination"]}},
+  {name:"create_booking_intent",description:"Create a prototype handoff intent. The current link opens the official Vietnam Airlines site; production offer transfer requires VNA authorisation.",
+   input_schema:{type:"object",properties:{flight_id:{type:"string"},passengers:{type:"integer"},tier:{type:"string"}},required:["flight_id"]}},
+];
+
+const SYSTEM = `You are a SmartSearch prototype assistant for travellers in Australia planning flights to Vietnam.
+
+${TODAY_CONTEXT}
+
+Rules:
+- Use the tools only as illustrative prototype fixtures. Never describe results as live, VNA-authorised, price-locked or confirmed availability.
+- Be efficient: call search_flights first. If the traveller is a Lotusmiles member, call get_lotusmiles_price on your top pick. If they're flexible, you may call suggest_flexible_dates. For families, compare_family_bundle is useful.
+- If the request contains two or more origin groups, call plan_multi_origin_trip once and preserve each group's passenger count and origin. Use total_budget only when the traveller states a shared/combined total.
+- When the traveller wants to proceed, explain that the current link opens the official VNA site and a production offer handoff requires VNA authorisation.
+- Keep replies warm, concise and specific. Use short paragraphs. Refer to flights by route and price, not raw JSON.
+- Understand English and Vietnamese. If a key detail is missing (like destination), ask ONE brief question.
+- Remind the traveller that VNA validates the live fare and availability and handles all payment and ticketing.`;
+
+// ===========================================================================
+//  UI HELPERS
+// ===========================================================================
+const stream=document.getElementById("stream"), input=document.getElementById("input"), sendBtn=document.getElementById("send");
+const EXAMPLES=[
+  "I want to fly from Sydney to Hanoi for Tết 2027",
+  "Help my family plan a trip from Australia to Vietnam",
+];
+const exWrap=document.getElementById("examples");
+EXAMPLES.forEach(ex=>{const b=document.createElement("button");b.textContent=ex;b.onclick=()=>run(ex);exWrap.appendChild(b);});
+
+const chatConsole=document.getElementById("chatConsole"), maximizeChat=document.getElementById("maximizeChat"), restoreChat=document.getElementById("restoreChat");
+function setChatMaximized(maximized){
+  chatConsole.classList.toggle("maximized",maximized);document.body.classList.toggle("chat-maximized",maximized);
+  maximizeChat.disabled=maximized;maximizeChat.setAttribute("aria-disabled",String(maximized));
+  restoreChat.disabled=!maximized;restoreChat.setAttribute("aria-disabled",String(!maximized));
+  if(maximized) input.focus();
+}
+maximizeChat.onclick=()=>setChatMaximized(true);restoreChat.onclick=()=>setChatMaximized(false);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&chatConsole.classList.contains("maximized"))setChatMaximized(false);});
+
+function el(h){const d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild;}
+function scroll(){stream.scrollTop=stream.scrollHeight;}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function addUser(t){stream.appendChild(el(`<div class="msg user"><div class="who">You</div><div class="bubble">${esc(t)}</div></div>`));scroll();}
+function thinkingBubble(){const m=el(`<div class="msg agent"><div class="who">Travel Agent</div><div class="bubble"><span class="thinking"><span></span><span></span><span></span></span></div></div>`);stream.appendChild(m);scroll();return m;}
+function mdToHtml(t){
+  // minimal: **bold**, paragraphs
+  let h=esc(t).replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  h=h.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,"<br>")}</p>`).join("");
+  return h;
+}
+function syntaxJson(obj){
+  let j=JSON.stringify(obj,null,2);
+  return esc(j).replace(/&quot;([^&]+)&quot;:/g,'<span class="k">"$1"</span>:')
+    .replace(/: &quot;([^&]*)&quot;/g,': <span class="s">"$1"</span>')
+    .replace(/: (-?\d+\.?\d*)/g,': <span class="n">$1</span>');
+}
+function renderToolCall(name,request,response){
+  const block=el(`<div class="toolcall">
+    <div class="tc-head"><div class="tc-icon">⚙</div>
+      <div><div class="tc-title">MCP tool · ${name}<span class="tc-status">✓ prototype response</span></div>
+        <div class="tc-route">claude agent → vna-agentic-gateway</div></div>
+      <div class="tc-arrow">▼</div></div>
+    <div class="tc-body">
+      <div class="tc-label">Request</div><div class="codeblock">${syntaxJson(request)}</div>
+      <div class="tc-label">Prototype response</div><div class="codeblock">${syntaxJson(response)}</div>
+    </div></div>`);
+  const head=block.querySelector(".tc-head"),body=block.querySelector(".tc-body"),arr=block.querySelector(".tc-arrow");
+  head.onclick=()=>{body.classList.toggle("open");arr.textContent=body.classList.contains("open")?"▲":"▼";};
+  stream.appendChild(block);scroll();
+  // briefly auto-open to prove it's real
+  body.classList.add("open");arr.textContent="▲";
+  setTimeout(()=>{body.classList.remove("open");arr.textContent="▼";},1400);
+}
+function renderFareLadder(flight){
+  const fares=flight.fares||fareLadder(flight.price_aud);
+  const rows=fares.map(f=>`<div class="fareitem"><div class="fare-top"><span>${f.name}</span><span>${AUD(f.price_aud)}</span></div><div class="fare-conds">${f.change} · ${f.refund} · ${f.baggage}</div></div>`).join("");
+  return `<details class="farebox"><summary>Fare options · from ${AUD(fares[0].price_aud)}</summary><div class="fare-list">${rows}</div></details>`;
+}
+function renderFlightsRich(response, lotus){
+  if(!response||!response.results||!response.results.length) return "";
+  const rows=response.results.slice(0,3).map((f,i)=>{
+    const mp=(lotus&&lotus.flight_id===f.id)?lotus.member_price_aud:null;
+    const price=mp?`<span class="old">${AUD(f.price_aud)}</span>${AUD(mp)}`:AUD(f.price_aud);
+    return `<div class="fcard ${i===0?'best':''}">${i===0?'<div class="best-badge">Best match</div>':''}
+      <div><div class="froute">${f.origin} <span style="color:#c9a24b;">→</span> ${f.destination}</div>
+      <div class="fmeta">${f.oc} → ${f.dc} · ${new Date(f.date).toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"})} · ${f.depart} · ${f.stops===0?'Direct':f.stops+' stop'} · ${f.ac}</div>
+      ${f.reasons&&f.reasons.length?`<div class="fwhy">Why: ${f.reasons.join(" · ")}</div>`:''}</div>
+      <div class="fright"><div class="fprice">${price}</div><div class="fsub">per adult${mp?' · illustrative member scenario':''}</div><div style="margin-top:8px;"><a href="https://www.vietnamairlines.com/au/en/home" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#0d5c5c;color:#fff;text-decoration:none;border-radius:8px;padding:8px 11px;font-size:12px;font-weight:700;">Continue on Vietnam Airlines ↗</a></div></div></div>${i===0?renderFareLadder(f):''}`;
+  }).join("");
+  return `<div class="flights">${rows}</div>`;
+}
+function renderBooking(bk){
+  return `<div class="booking"><h4>Prototype selection · ${bk.selection_ref}</h4>
+    <div class="row"><span>Flight</span><b>${bk.flight_id} · ${bk.route} · ${new Date(bk.date).toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"})}</b></div>
+    <div class="row"><span>Passengers</span><b>${bk.passengers}</b></div>
+    <div class="row"><span>Price per adult</span><b>${AUD(bk.price_per_person_aud)}${bk.tier&&bk.tier!=="none"?` (${bk.tier})`:""}</b></div>
+    <div class="row"><span>Total</span><b>${AUD(bk.total_aud)}</b></div>
+    <div class="handoff"><a href="https://www.vietnamairlines.com/au/en/home" target="_blank" rel="noopener noreferrer">Continue on Vietnam Airlines</a> — VNA validates live fare and availability.</div>
+    <div class="no-ota">Prototype only; payment and ticketing are outside this system.</div></div>`;
+}
+
+// ===========================================================================
+//  THE AGENT LOOP — real Claude tool-use
+// ===========================================================================
+let busy=false;
+let lastLotus=null, lastSearch=null, lastBooking=null;
+
+async function run(text){
+  if(busy) return; busy=true; sendBtn.disabled=true;
+  addUser(text);
+  lastLotus=null; lastSearch=null; lastBooking=null;
+
+  let messages=[{role:"user",content:text}];
+  let think=thinkingBubble();
+  let safety=0;
+
+  try{
+    while(safety++ < 8){
+      // Calls the local proxy (proxy.py), which injects the API key server-side.
+      // The proxy keeps your ANTHROPIC_API_KEY out of the browser.
+      const res=await fetch("http://localhost:8787/api/agent",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-6",max_tokens:1200,
+          system:SYSTEM,tools:TOOL_SCHEMAS,messages
+        })
+      });
+      const data=await res.json();
+      if(data.type==="error"||!data.content){throw new Error(data.error?.message||"API error");}
+
+      // collect text + tool_use
+      const textParts=data.content.filter(c=>c.type==="text").map(c=>c.text).join("\n").trim();
+      const toolUses=data.content.filter(c=>c.type==="tool_use");
+
+      // show any assistant text
+      if(textParts){
+        if(think){think.remove();think=null;}
+        let extra="";
+        // enrich: if last search produced results, render cards after the text of this turn
+        stream.appendChild(el(`<div class="msg agent"><div class="who">Travel Agent</div><div class="bubble">${mdToHtml(textParts)}${extra}</div></div>`));
+        scroll();
+      }
+
+      if(toolUses.length===0){ break; } // agent done
+
+      // push assistant turn (with tool_use) to history
+      messages.push({role:"assistant",content:data.content});
+
+      // execute each tool, render, collect results
+      const toolResults=[];
+      for(const tu of toolUses){
+        const fn=TOOLS[tu.name];
+        let out;
+        try{ out = fn ? fn(tu.input||{}) : {error:"unknown tool"}; }
+        catch(e){ out={error:String(e)}; }
+        // stash notable outputs for rich rendering
+        if(tu.name==="search_flights") lastSearch=out;
+        if(tu.name==="get_lotusmiles_price") lastLotus=out;
+        if(tu.name==="create_booking_intent") lastBooking=out;
+
+        renderToolCall(tu.name, tu.input||{}, out);
+
+        // rich visual after certain tools
+        if(tu.name==="search_flights"){
+          const rich=renderFlightsRich(out,lastLotus);
+          if(rich) stream.appendChild(el(`<div class="msg agent"><div class="who">Travel Agent</div><div class="bubble">Here's what Vietnam Airlines returned:${rich}</div></div>`));
+          scroll();
+        }
+        if(tu.name==="create_booking_intent" && !out.error){
+          stream.appendChild(el(`<div class="msg agent"><div class="who">Travel Agent</div><div class="bubble">${renderBooking(out)}</div></div>`));
+          scroll();
+        }
+
+        toolResults.push({type:"tool_result",tool_use_id:tu.id,content:JSON.stringify(out)});
+        await new Promise(r=>setTimeout(r,150));
+      }
+      messages.push({role:"user",content:toolResults});
+      if(!think) think=thinkingBubble();
+    }
+  }catch(e){
+    if(think){think.remove();think=null;}
+    stream.appendChild(el(`<div class="msg agent"><div class="bubble err">The optional live agent is unavailable: ${esc(e.message||String(e))}. The stable demo still works without an API key: <a href="index.html">open stable demo</a>.</div></div>`));
+    scroll();
+  }finally{
+    if(think) think.remove();
+    busy=false;sendBtn.disabled=false;
+  }
+}
+
+sendBtn.onclick=()=>{const v=input.value.trim();if(v){run(v);input.value="";}};
+input.addEventListener("keydown",e=>{if(e.key==="Enter"){const v=input.value.trim();if(v){run(v);input.value="";}}});
+</script>
+</body>
+</html>

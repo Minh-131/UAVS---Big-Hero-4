@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .title{font:700 38px Arial,sans-serif;fill:#083f46}.sub{font:20px Arial,sans-serif;fill:#52656a}
+      .head{font:700 23px Arial,sans-serif;fill:#083f46}.body{font:17px Arial,sans-serif;fill:#30484d}
+      .small{font:15px Arial,sans-serif;fill:#52656a}.box{fill:#fff;stroke:#0d6770;stroke-width:3;rx:18}
+      .soft{fill:#eef8f7;stroke:#0d6770;stroke-width:3;rx:18}.future{fill:#fff9e8;stroke:#c89b28;stroke-width:3;rx:18}
+      .out{fill:#fff1ef;stroke:#b84b3f;stroke-width:3;rx:18}.arrow{stroke:#0d6770;stroke-width:5;fill:none;marker-end:url(#end)}
+      .dash{stroke:#c89b28;stroke-width:4;fill:none;stroke-dasharray:12 10;marker-end:url(#goldend)}
+    </style>
+    <marker id="end" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#0d6770"/></marker>
+    <marker id="goldend" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#c89b28"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#f7f5ef"/>
+  <text x="80" y="72" class="title">VNA SmartSearch — Round 2 Architecture</text>
+  <text x="80" y="108" class="sub">Search and recommendation layer supporting NEO · booking and payment remain on Vietnam Airlines</text>
+
+  <rect x="70" y="290" width="245" height="210" class="box"/>
+  <text x="105" y="345" class="head">Traveller</text>
+  <text x="105" y="390" class="body">• Web Australia</text><text x="105" y="425" class="body">• English / Vietnamese</text>
+  <text x="105" y="460" class="body">• Natural-language need</text>
+
+  <path d="M315 395 H405" class="arrow"/>
+
+  <rect x="405" y="205" width="515" height="390" class="soft"/>
+  <text x="445" y="255" class="head">SmartSearch layer</text>
+  <rect x="445" y="285" width="435" height="70" class="box"/><text x="475" y="329" class="body">Search UI + clarification</text>
+  <rect x="445" y="375" width="435" height="70" class="box"/><text x="475" y="419" class="body">Intent parser: rule-based / optional LLM</text>
+  <rect x="445" y="465" width="435" height="90" class="box"/><text x="475" y="505" class="body">Recommendation + MCP tools</text><text x="475" y="532" class="small">budget · flexible dates · multi-origin · direct value</text>
+
+  <path d="M920 350 H1010" class="arrow"/>
+  <rect x="1010" y="205" width="500" height="220" class="box"/>
+  <text x="1050" y="252" class="head">Prototype data provider</text>
+  <text x="1050" y="295" class="body">Deterministic Tết 2027 demo fixtures</text>
+  <text x="1050" y="330" class="body">Shared by web + Python MCP</text>
+  <text x="1050" y="375" class="small">No private VNA API claimed in Round 2</text>
+
+  <path d="M920 500 H1010" class="dash"/>
+  <rect x="1010" y="470" width="500" height="160" class="future"/>
+  <text x="1050" y="517" class="head">Production data provider</text>
+  <text x="1050" y="560" class="body">VNA-authorised schedule/fare source</text>
+  <text x="1050" y="595" class="small">Enabled only after VNA approval and access</text>
+
+  <path d="M665 595 V690" class="arrow"/>
+  <rect x="405" y="690" width="515" height="120" class="box"/>
+  <text x="445" y="735" class="head">Official VNA handoff</text>
+  <text x="445" y="775" class="body">Traveller continues on vietnamairlines.com</text>
+
+  <path d="M920 750 H1010" class="arrow"/>
+  <rect x="1010" y="690" width="500" height="120" class="out"/>
+  <text x="1050" y="735" class="head">Booking / PSS / GDS / payment</text>
+  <text x="1050" y="775" class="body">OUT OF SCOPE · untouched by SmartSearch</text>
+
+  <text x="80" y="858" class="small">Solid path = current prototype · dashed path = future authorised integration</text>
+</svg>
